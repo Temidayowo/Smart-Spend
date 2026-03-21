@@ -29,6 +29,39 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Authentication
+
+This project uses **NextAuth.js** with a Prisma adapter.
+
+#### Environment variables
+
+Create a `.env` file at the project root and add the following:
+
+```env
+DATABASE_URL=postgresql://user:pass@host:5432/dbname
+NEXTAUTH_SECRET=your-random-secret (use `openssl rand -hex 32` or similar)
+GOOGLE_CLIENT_ID=...       # optional if using Google OAuth
+GOOGLE_CLIENT_SECRET=...   # optional
+```
+
+The `NEXTAUTH_SECRET` is required for production; in development NextAuth will generate one for you.
+
+You will also need a hashing library; install it with:
+
+```bash
+npm install bcryptjs
+# or yarn add bcryptjs
+```
+
+#### API endpoints
+
+- `POST /api/auth/register` – creates a new user with hashed password.
+- `GET|POST /api/auth/[...nextauth]` – NextAuth handler (credentials + Google).
+
+Forms in `/app/(auth)/register` and `/app/(auth)/login` use these endpoints.
+
+Refer to the `src/lib/auth.ts` file for the authentication configuration and provider setup.
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
