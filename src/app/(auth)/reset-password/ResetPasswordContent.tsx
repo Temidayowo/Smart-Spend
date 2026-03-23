@@ -28,11 +28,9 @@ const ResetPasswordContent = () => {
       await resetPassword(newPassword, confirmNewPassword, token!);
       toast.success("Password reset successful. You can now log in.");
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Something went wrong. Please try again.";
-      toast.error(message);
+      // Re-throw non-Error exceptions (like Next.js redirect)
+      if (!(error instanceof Error)) throw error;
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }

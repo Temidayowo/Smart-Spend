@@ -15,7 +15,6 @@ import Link from "next/link";
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -26,25 +25,16 @@ export default function LoginPage() {
     }
   }, [session, router]);
 
-  if (status === "loading") {
-    return <p>Loading...</p>;
-  }
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  e.preventDefault();
+  setLoading(true);
 
-    const formData = new FormData(e.currentTarget);
-    setLoading(true);
-
-    try {
-      await loginUser(formData);
-    } catch (error) {
-      setError("Login failed. Please check your credentials and try again.");
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    await loginUser(new FormData(e.currentTarget));
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <Card>
@@ -95,12 +85,6 @@ export default function LoginPage() {
           <p className="text-sm text-center text-gray-500 mb-6">
             Log in to your SpendSmart account
           </p>
-
-          {error && (
-            <p className="text-red-500 text-sm mb-4 bg-red-50 border border-red-200 rounded-md px-3 py-2">
-              {error}
-            </p>
-          )}
 
           <div className="my-5 w-full">
             <Google />

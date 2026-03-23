@@ -25,7 +25,6 @@ model User {
   expenses           Expense[]
   income             Income[]
   passwordResets     PasswordReset[]
-  sessions           Session[]
   verificationTokens VerificationToken[]
 
   @@map("users")
@@ -60,17 +59,6 @@ model PasswordReset {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("password_resets")
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  userId       String
-  sessionToken String   @unique
-  expires      DateTime
-  createdAt    DateTime @default(now())
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("sessions")
 }
 
 model VerificationToken {

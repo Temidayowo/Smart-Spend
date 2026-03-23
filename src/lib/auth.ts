@@ -1,20 +1,26 @@
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import { prisma } from "./prisma";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 
+class InvalidCredentialsError extends CredentialsSignin {
+  code = "invalid_credentials";
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
 
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days max
+    maxAge: 30 * 24 * 60 * 60,
   },
 
   providers: [
-    Google,
+    Google({
+      allowDangerousEmailAccountLinking: true, // allows Google to link to existing email account
+    }),
     Credentials({
       credentials: {
         email: { label: "Email", type: "email" },
@@ -28,14 +34,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           where: { email: credentials.email as string },
         });
 
-        if (!user || !user.passwordHash) return null;
+        // No user or no password hash — invalid credentials either way
+        if (!user || !user.passwordHash) throw new InvalidCredentialsError();
 
         const isValid = await bcrypt.compare(
           credentials.password as string,
           user.passwordHash,
         );
 
-        if (!isValid) return null;
+        if (!isValid) throw new InvalidCredentialsError();
 
         return {
           ...user,
@@ -55,10 +62,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           (user.rememberMe ? 30 * 24 * 60 * 60 : 24 * 60 * 60);
       }
 
-      // Invalidate token if past intended expiry
       if (token.expiresAt && Date.now() / 1000 > (token.expiresAt as number)) {
         return null;
       }
+
+      if (!token.sub) return token;
+
+      const userExists = await prisma.user.findUnique({
+        where: { id: token.sub as string },
+        select: { id: true },
+      });
+
+      if (!userExists) return null;
 
       return token;
     },

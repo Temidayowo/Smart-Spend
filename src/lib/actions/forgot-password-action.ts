@@ -23,9 +23,6 @@ export async function requestPasswordReset(
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return { success: true };
 
-  // Users registered via OAuth won't have a password — skip silently
-  if (!user.passwordHash) return { success: true };
-
   // Invalidate any existing reset tokens for this user
   await prisma.passwordReset.deleteMany({ where: { userId: user.id } });
 
@@ -44,7 +41,7 @@ export async function requestPasswordReset(
 }
 
 // ---------------------------------------------------------------------------
-// Reset password
+// Reset password (also used by OAuth users to set a password for first time)
 // ---------------------------------------------------------------------------
 
 export async function resetPassword(
