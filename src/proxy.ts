@@ -1,14 +1,8 @@
-// proxy.ts (in the root of your project, same place as middleware.ts)
-import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { auth } from "@/lib/auth";
+import { NextResponse } from "next/server";
 
-export async function proxy(req: NextRequest) {
-  const token = await getToken({
-    req,
-    secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
-  });
-
-  const isAuthenticated = !!token;
+export default auth((req) => {
+  const isAuthenticated = !!req.auth;
   const { pathname } = req.nextUrl;
 
   const isAuthPage =
@@ -23,7 +17,7 @@ export async function proxy(req: NextRequest) {
   }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
   matcher: ["/dashboard/:path*", "/profile/:path*", "/login", "/register"],
