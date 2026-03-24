@@ -131,12 +131,6 @@ const Navbar = () => {
             transition={{ duration: 0.5, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="flex items-center gap-3"
           >
-            <Link
-              href="/register"
-              className="text-sm font-semibold text-white bg-[#2158d2] px-4 py-2 rounded-lg hover:bg-[#1a46b0] transition-colors duration-200"
-            >
-              Get Started
-            </Link>
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={() => setMobileOpen((v) => !v)}
@@ -204,15 +198,23 @@ const Navbar = () => {
                 </motion.a>
               ))}
               <motion.div
+                className="flex flex-col gap-2 mt-2"
                 variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0 } }}
                 transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
               >
                 <Link
                   href="/login"
                   onClick={() => setMobileOpen(false)}
-                  className="block text-center text-sm font-semibold text-[#2158d2] border border-[#2158d2] px-4 py-2.5 rounded-lg hover:bg-[#2158d2] hover:text-white transition-all duration-200 mt-2"
+                  className="block text-center text-sm font-semibold text-[#2158d2] border border-[#2158d2] px-4 py-2.5 rounded-lg hover:bg-[#2158d2] hover:text-white transition-all duration-200"
                 >
                   Login
+                </Link>
+                <Link
+                  href="/register"
+                  onClick={() => setMobileOpen(false)}
+                  className="block text-center text-sm font-semibold text-white bg-[#2158d2] px-4 py-2.5 rounded-lg hover:bg-[#1a46b0] transition-colors duration-200"
+                >
+                  Get Started
                 </Link>
               </motion.div>
             </motion.div>
