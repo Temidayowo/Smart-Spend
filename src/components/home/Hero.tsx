@@ -66,7 +66,7 @@ const Hero = () => {
         >
           <Link
             href="/register"
-            className="group flex items-center gap-2 bg-[#2158d2] hover:bg-[#1a46b0] text-white font-bold px-8 py-4 rounded-xl text-base transition-all duration-200 shadow-xl shadow-blue-900/50"
+            className="group flex items-center gap-2 bg-[#2158d2] hover:bg-[#1a46b0] text-white font-bold px-6 py-3 sm:px-8 sm:py-4 rounded-xl text-sm sm:text-base transition-all duration-200 shadow-xl shadow-blue-900/50"
           >
             Start for Free
             <ArrowRight
@@ -76,7 +76,7 @@ const Hero = () => {
           </Link>
           <a
             href="#how-it-works"
-            className="flex items-center gap-2 text-blue-200 hover:text-white font-semibold px-6 py-4 transition-colors"
+            className="flex items-center gap-2 text-blue-200 hover:text-white font-semibold px-4 py-3 sm:px-6 sm:py-4 text-sm sm:text-base transition-colors"
           >
             See how it works <ChevronDown size={16} />
           </a>
