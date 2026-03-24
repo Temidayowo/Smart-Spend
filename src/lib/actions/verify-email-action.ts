@@ -3,7 +3,6 @@
 import { prisma } from "../prisma";
 import { auth } from "../auth";
 import { sendOtpEmail } from "../mail";
-import { redirect } from "next/navigation";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -21,7 +20,6 @@ function otpExpiry(): Date {
 // Public actions
 // ---------------------------------------------------------------------------
 
-/** Called inside registerUser after the user is created. */
 export async function createAndSendOtp(email: string) {
   await prisma.verificationToken.deleteMany({ where: { identifier: email } });
 
@@ -35,8 +33,7 @@ export async function createAndSendOtp(email: string) {
   await sendOtpEmail(email, otp, expiresAt);
 }
 
-/** Verifies the OTP the user typed. Returns on success, throws on failure. */
-export async function verifyEmail(otp: string) {
+export async function verifyEmail(otp: string): Promise<{ success: boolean }> {
   const session = await auth();
   if (!session?.user?.email) throw new Error("Not authenticated.");
 
@@ -58,10 +55,9 @@ export async function verifyEmail(otp: string) {
     prisma.verificationToken.delete({ where: { token: otp } }),
   ]);
 
-  redirect("/dashboard");
+  return { success: true }; // let client handle redirect
 }
 
-/** Deletes the old token, creates a fresh one, and re-sends the email. */
 export async function resendVerificationEmail() {
   const session = await auth();
   if (!session?.user?.email) throw new Error("Not authenticated.");

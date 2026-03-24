@@ -10,6 +10,9 @@ import {
   verifyEmail,
 } from "@/lib/actions/verify-email-action";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
+import { compareSync } from "bcryptjs";
 
 type VerifyEmailFormProps = {
   email: String;
@@ -21,9 +24,9 @@ const VerifyEmailForm = ({ email, expired }: VerifyEmailFormProps) => {
   const [timeLeft, setTimeLeft] = useState("");
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
-
-  // ← keep expiry in state so resend can update it immediately
   const [expiryDate, setExpiryDate] = useState<Date>(expired);
+
+  const router = useRouter();
 
   useEffect(() => {
     // reset and restart timer whenever expiryDate changes
@@ -46,31 +49,45 @@ const VerifyEmailForm = ({ email, expired }: VerifyEmailFormProps) => {
 
  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
    e.preventDefault();
+
+   // Guard: don't submit if OTP is incomplete
+   if (otp.length < 6) {
+     toast.error("Please enter the complete 6-digit code.");
+     return;
+   }
+
    setLoading(true);
    try {
-     await verifyEmail(otp);
+     const result = await verifyEmail(otp);
+     if (result.success) {
+       toast.success("Email verified successfully!");
+       router.push("/dashboard");
+     }
    } catch (error) {
-     if (!(error instanceof Error)) throw error; // re-throw redirect
-     toast.error(error.message);
+     toast.error(
+       error instanceof Error ? error.message : "Something went wrong.",
+     );
    } finally {
      setLoading(false);
    }
  }
 
-  async function handleResend() {
-    setResending(true);
-    try {
-      await resendVerificationEmail();
-      setExpiryDate(new Date(Date.now() + 10 * 60 * 1000));
-      setOtp("");
-      toast.success("A new OTP has been sent to your email.");
-    } catch (error) {
-      if (!(error instanceof Error)) throw error;
-      toast.error(error.message);
-    } finally {
-      setResending(false);
-    }
-  }
+ async function handleResend() {
+   setResending(true);
+   try {
+     await resendVerificationEmail();
+     setExpiryDate(new Date(Date.now() + 10 * 60 * 1000));
+     setOtp("");
+     toast.success("A new OTP has been sent to your email.");
+   } catch (error) {
+     if (isRedirectError(error)) throw error;
+     toast.error(
+       error instanceof Error ? error.message : "Something went wrong.",
+     );
+   } finally {
+     setResending(false);
+   }
+ }
 
 
   return (
@@ -103,7 +120,7 @@ const VerifyEmailForm = ({ email, expired }: VerifyEmailFormProps) => {
           onSubmit={handleSubmit}
         >
           <OTPInput onOtpChange={setOtp} />
-          <Button type="submit" className="w-full" loading={loading}>
+          <Button type="submit" className="w-full" loading={loading} disabled={loading || otp.length < 6}>
             Verify OTP
           </Button>
         </form>
