@@ -23,7 +23,7 @@ const Hero = () => {
         style={{ background: "radial-gradient(circle, #06b6d4, transparent)" }}
       />
 
-      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center py-20 sm:py-0">
         <div
           className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 mb-8 text-sm text-blue-200 font-medium backdrop-blur-sm"
           style={{ animation: "fadeInDown 0.6s ease both" }}
@@ -33,7 +33,7 @@ const Hero = () => {
         </div>
 
         <h1
-          className="text-5xl sm:text-6xl lg:text-8xl font-black text-white leading-[0.95] tracking-tight mb-6"
+          className="text-4xl sm:text-6xl lg:text-8xl font-black text-white leading-[0.95] tracking-tight mb-6"
           style={{
             animation: "fadeInUp 0.7s ease 0.1s both",
             fontFamily: "'Syne', sans-serif",
