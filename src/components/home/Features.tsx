@@ -93,7 +93,7 @@ function FeatureCard({
 
         {/* Bottom accent line */}
         <motion.div
-          className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-[#2158d2] to-cyan-400 rounded-full"
+          className="absolute bottom-0 left-0 h-0.5 bg-linear-to-r from-[#2158d2] to-cyan-400 rounded-full"
           initial={{ width: "0%" }}
           whileHover={{ width: "100%" }}
           transition={{ duration: 0.4, ease: "easeOut" }}
