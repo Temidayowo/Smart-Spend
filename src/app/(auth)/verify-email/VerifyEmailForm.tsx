@@ -9,6 +9,7 @@ import {
   resendVerificationEmail,
   verifyEmail,
 } from "@/lib/actions/verify-email-action";
+import { toast } from "sonner";
 
 type VerifyEmailFormProps = {
   email: String;
@@ -43,31 +44,34 @@ const VerifyEmailForm = ({ email, expired }: VerifyEmailFormProps) => {
     return () => clearInterval(interval);
   }, [expiryDate]); // ← re-runs when expiryDate changes
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await verifyEmail(otp);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  }
+ async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+   e.preventDefault();
+   setLoading(true);
+   try {
+     await verifyEmail(otp);
+   } catch (error) {
+     if (!(error instanceof Error)) throw error; // re-throw redirect
+     toast.error(error.message);
+   } finally {
+     setLoading(false);
+   }
+ }
 
   async function handleResend() {
     setResending(true);
     try {
       await resendVerificationEmail();
-      // set new expiry immediately — 10 minutes from now
       setExpiryDate(new Date(Date.now() + 10 * 60 * 1000));
       setOtp("");
+      toast.success("A new OTP has been sent to your email.");
     } catch (error) {
-      console.log(error);
+      if (!(error instanceof Error)) throw error;
+      toast.error(error.message);
     } finally {
       setResending(false);
     }
   }
+
 
   return (
     <div className="w-full min-h-screen bg-white flex items-center justify-center px-4">
